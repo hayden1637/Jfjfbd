@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Roblox Icon Generator</title>
+
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+<style>
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+body {
+    min-height: 100vh;
+    background:
+        radial-gradient(circle at top left, #303040 0%, transparent 35%),
+        radial-gradient(circle at bottom right, #19191f 0%, transparent 40%),
+        #111116;
+    color: white;
+    display: flex;
+    justify-content: center;
+    padding: 30px 15px;
+}
+
+.container {
+    width: 100%;
+    max-width: 1050px;
+}
+
+.header {
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+.logo {
+    width: 70px;
+    height: 70px;
+    background: white;
+    color: #111;
+    border-radius: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 30px;
+    font-weight: 900;
+    margin: 0 auto 15px;
+    box-shadow: 0 10px 35px rgba(0,0,0,.35);
+}
+
+h1 {
+    font-size: 32px;
+    font-weight: 900;
+}
+
+.subtitle {
+    color: #9999a5;
+    margin-top: 7px;
+}
+
+.panel {
+    background: rgba(28,28,35,.96);
+    border: 1px solid #393943;
+    border-radius: 20px;
+    padding: 24px;
+    box-shadow: 0 20px 60px rgba(0,0,0,.35);
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+}
+
+.full {
+    grid-column: 1 / -1;
+}
+
+label {
+    display: block;
+    color: #cfcfd8;
+    font-size: 14px;
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+
+input,
+select,
+textarea {
+    width: 100%;
+    background: #17171d;
+    color: white;
+    border: 1px solid #41414c;
+    border-radius: 12px;
+    padding: 13px 14px;
+    outline: none;
+    font-size: 15px;
+    transition: .2s;
+}
+
+textarea {
+    min-height: 125px;
+    resize: vertical;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+    border-color: #8b5cf6;
+    box-shadow: 0 0 0 3px rgba(139,92,246,.15);
+}
+
+.token-wrap {
+    position: relative;
+}
+
+.token-wrap input {
+    padding-right: 90px;
+}
+
+.show-token {
+    position: absolute;
+    right: 8px;
+    top: 7px;
+    bottom: 7px;
+    padding: 0 12px;
+    border: none;
+    border-radius: 9px;
+    background: #292932;
+    color: #bbb;
+    cursor: pointer;
+}
+
+.help {
+    font-size: 12px;
+    color: #777783;
+    margin-top: 7px;
+}
+
+.generate {
+    width: 100%;
+    margin-top: 22px;
+    border: none;
+    border-radius: 14px;
+    padding: 16px;
+    background: linear-gradient(135deg, #8b5cf6, #6d3df0);
+    color: white;
+    font-size: 17px;
+    font-weight: 900;
+    cursor: pointer;
+    box-shadow: 0 8px 25px rgba(124,58,237,.3);
+    transition: .2s;
+}
+
+.generate:hover {
+    transform: translateY(-2px);
+    filter: brightness(1.08);
+}
+
+.generate:disabled {
+    opacity: .55;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.status {
+    margin-top: 20px;
+    padding: 15px;
+    border-radius: 12px;
+    background: #17171d;
+    border: 1px solid #353540;
+    display: none;
+}
+
+.status.show {
+    display: block;
+}
+
+.status-title {
+    font-weight: 800;
+    margin-bottom: 6px;
+}
+
+.status-text {
+    color: #9999a5;
+    font-size: 14px;
+    word-break: break-word;
+}
+
+.operation {
+    margin-top: 10px;
+    font-family: monospace;
+    background: #101014;
+    padding: 9px;
+    border-radius: 8px;
+    color: #a78bfa;
+    display: none;
+    word-break: break-all;
+}
+
+.results {
+    margin-top: 25px;
+    display: none;
+}
+
+.results.show {
+    display: block;
+}
+
+.results h2 {
+    font-size: 21px;
+    margin-bottom: 15px;
+}
+
+.result-box {
+    background: #17171d;
+    border: 1px solid #383842;
+    border-radius: 15px;
+    padding: 18px;
+}
+
+pre {
+    white-space: pre-wrap;
+    word-break: break-word;
+    color: #bdbdc8;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.security {
+    margin-top: 18px;
+    background: rgba(245,158,11,.08);
+    border: 1px solid rgba(245,158,11,.25);
+    color: #d7b66c;
+    padding: 13px;
+    border-radius: 12px;
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+@media(max-width: 700px) {
+    .grid {
+        grid-template-columns: 1fr;
+    }
+
+    .full {
+        grid-column: auto;
+    }
+
+    h1 {
+        font-size: 26px;
+    }
+
+    .panel {
+        padding: 17px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="header">
+        <div class="logo">R</div>
+        <h1>Roblox Icon Generator</h1>
+        <div class="subtitle">
+            Generate custom Roblox game icons from a prompt
+        </div>
+    </div>
+
+    <div class="panel">
+
+        <div class="grid">
+
+            <div class="full">
+                <label>API Token</label>
+
+                <div class="token-wrap">
+                    <input
+                        id="token"
+                        type="password"
+                        placeholder="Bearer sk-..."
+                        autocomplete="off"
+                    >
+
+                    <button
+                        class="show-token"
+                        onclick="toggleToken()"
+                    >
+                        Show
+                    </button>
+                </div>
+
+                <div class="help">
+                    Your token is only used by this page for the request.
+                    Do not publish it inside your website code.
+                </div>
+            </div>
+
+            <div class="full">
+                <label>Icon Prompt</label>
+
+                <textarea
+                    id="prompt"
+                    placeholder="Example: A powerful Roblox character holding a glowing sword, dramatic blue lighting, epic game icon, highly detailed"
+                ></textarea>
+            </div>
+
+            <div>
+                <label>Style</label>
+
+                <select id="style">
+                    <option value="Default">Default</option>
+                    <option value="Cartoon">Cartoon</option>
+                    <option value="Realistic">Realistic</option>
+                </select>
+            </div>
+
+            <div>
+                <label>Perspective</label>
+
+                <select id="perspective">
+                    <option value="Default">Default</option>
+                    <option value="Close-up">Close-up</option>
+                    <option value="Medium shot">Medium shot</option>
+                    <option value="Wide shot">Wide shot</option>
+                </select>
+            </div>
+
+            <div>
+                <label>Roblox User ID</label>
+
+                <input
+                    id="robloxUserId"
+                    type="text"
+                    placeholder="Optional — e.g. 1234567890"
+                >
+            </div>
+
+            <div>
+                <label>Number of Images</label>
+
+                <select id="amount">
+                    <option value="1">1 image</option>
+                    <option value="2">2 images</option>
+                    <option value="3" selected>3 images</option>
+                </select>
+            </div>
+
+        </div>
+
+        <button
+            id="generateBtn"
+            class="generate"
+            onclick="generateIcon()"
+        >
+            Generate Roblox Icons
+        </button>
+
+        <div id="status" class="status">
+
+            <div id="statusTitle" class="status-title">
+                Generating...
+            </div>
+
+            <div id="statusText" class="status-text">
+                Sending your request...
+            </div>
+
+            <div id="operation" class="operation"></div>
+
+        </div>
+
+        <div id="results" class="results">
+
+            <h2>API Response</h2>
+
+            <div class="result-box">
+                <pre id="resultText"></pre>
+            </div>
+
+        </div>
+
+        <div class="security">
+            Keep your API token private. If you ever put this website online,
+            use a server-side proxy/backend instead of exposing the token in
+            browser JavaScript.
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+
+function toggleToken() {
+    const input = document.getElementById("token");
+    const button = document.querySelector(".show-token");
+
+    if (input.type === "password") {
+        input.type = "text";
+        button.textContent = "Hide";
+    } else {
+        input.type = "password";
+        button.textContent = "Show";
+    }
+}
+
+
+async function generateIcon() {
+
+    const token = document.getElementById("token").value.trim();
+    const prompt = document.getElementById("prompt").value.trim();
+    const style = document.getElementById("style").value;
+    const perspective = document.getElementById("perspective").value;
+    const robloxUserId = document.getElementById("robloxUserId").value.trim();
+    const amount = Number(document.getElementById("amount").value);
+
+    const button = document.getElementById("generateBtn");
+
+    const status = document.getElementById("status");
+    const statusTitle = document.getElementById("statusTitle");
+    const statusText = document.getElementById("statusText");
+    const operation = document.getElementById("operation");
+
+    const results = document.getElementById("results");
+    const resultText = document.getElementById("resultText");
+
+    if (!token) {
+        alert("Enter your API token first.");
+        return;
+    }
+
+    if (!prompt) {
+        alert("Enter an icon prompt first.");
+        return;
+    }
+
+    button.disabled = true;
+    button.textContent = "Generating...";
+
+    status.classList.add("show");
+    results.classList.remove("show");
+
+    statusTitle.textContent = "Generating Roblox icon...";
+    statusText.textContent = "Sending your request to the image generation API.";
+    operation.style.display = "none";
+    operation.textContent = "";
+
+    try {
+
+        const requestBody = {
+            prompt: prompt,
+            size: "1024x1024",
+            style: style,
+            perspective: perspective,
+            n: amount
+        };
+
+        if (robloxUserId) {
+            requestBody.robloxUserId = robloxUserId;
+        }
+
+        const response = await axios.post(
+            "/api/v1/generate-icon-thumbnail",
+            requestBody,
+            {
+                headers: {
+                    "x-api-key": token
+                }
+            }
+        );
+
+        const data = response.data;
+
+        statusTitle.textContent = "Generation request accepted";
+        statusText.textContent =
+            "The API has accepted your Roblox icon generation request.";
+
+        if (data?.data?.operationId) {
+
+            operation.style.display = "block";
+
+            operation.textContent =
+                "Operation ID: " + data.data.operationId;
+        }
+
+        resultText.textContent =
+            JSON.stringify(data, null, 2);
+
+        results.classList.add("show");
+
+    } catch (error) {
+
+        console.error(error);
+
+        statusTitle.textContent = "Generation failed";
+
+        let message = "Something went wrong.";
+
+        if (error.response) {
+
+            message =
+                "HTTP " +
+                error.response.status +
+                ": " +
+                JSON.stringify(
+                    error.response.data,
+                    null,
+                    2
+                );
+
+        } else if (error.request) {
+
+            message =
+                "The request was sent, but no response was received. " +
+                "The API may not allow browser/CORS requests.";
+
+        } else {
+
+            message = error.message;
+        }
+
+        statusText.textContent = message;
+
+        resultText.textContent = message;
+
+        results.classList.add("show");
+    }
+
+    button.disabled = false;
+    button.textContent = "Generate Roblox Icons";
+}
+
+</script>
+
+</body>
+</html>
